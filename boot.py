@@ -4,6 +4,8 @@ import gc
 import webrepl
 from umqttsimple import MQTTClient
 import ubinascii
+from machine import Pin
+from neopixel import NeoPixel
 import config
 
 def do_connect():
@@ -16,6 +18,15 @@ def do_connect():
         while not sta_if.isconnected():
             pass
     print('network config:', sta_if.ifconfig())
+
+# NEOPIXEL - noch vor dem WLAN aktivieren
+pin = Pin(0, Pin.OUT)   # set GPIO0 to output to drive NeoPixels
+np = NeoPixel(pin, 64)   # create NeoPixel driver on GPIO0 for 64 pixels
+
+for i in range(0,64):
+    np[i]=(211,54,2)
+    np.write()
+
 
 do_connect()
 webrepl.start()
