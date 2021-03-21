@@ -1,8 +1,7 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
-import uos, machine
 import gc
+import machine
 import webrepl
-from umqttsimple import MQTTClient
 import ubinascii
 from machine import Pin
 from neopixel import NeoPixel
