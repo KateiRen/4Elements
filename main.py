@@ -52,24 +52,29 @@ anim = anim_fire
 def sub_cb(topic, msg):
   print((topic, msg))
   if msg == b'earth':
-    anim = anim_earth
+    global anim = anim_earth
+    # fill(142,98,44)
     print("Neue Szene: Earth")
     client.publish(topic_pub, "Neue Szene: Earth")
   elif msg == b'fire':
-    anim = anim_fire
+    global anim = anim_fire
+    # fill(211,54,2)
     print("Neue Szene: Fire")
     client.publish(topic_pub, "Neue Szene: Fire")
   elif msg == b'air':
-    anim = anim_air
+    global anim = anim_air
+    # fill(193,226,255)
     print("Neue Szene: Air")
     client.publish(topic_pub, "Neue Szene: Air")
   elif msg == b'water':
-    anim = anim_water
+    global anim = anim_water
+    # fill(39,100,193)
     print("Neue Szene: Water")
     client.publish(topic_pub, "Neue Szene: Water")
   elif msg == b'reset':
     print("Softreset")
-    do_reset = True # Softreset in der Callback Funktion schlägt irgendwie fehl...
+    # global do_reset = True # Softreset in der Callback Funktion schlägt irgendwie fehl...
+    machine.soft_reset()
   elif topic == b'4elements/command' and msg == b'received':
     print('ESP received hello message')
 
