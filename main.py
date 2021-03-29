@@ -50,24 +50,25 @@ def anim_water():
 anim = anim_fire
 
 def sub_cb(topic, msg):
+  global anim
   print((topic, msg))
   if msg == b'earth':
-    global anim = anim_earth
+    anim = anim_earth
     # fill(142,98,44)
     print("Neue Szene: Earth")
     client.publish(topic_pub, "Neue Szene: Earth")
   elif msg == b'fire':
-    global anim = anim_fire
+    anim = anim_fire
     # fill(211,54,2)
     print("Neue Szene: Fire")
     client.publish(topic_pub, "Neue Szene: Fire")
   elif msg == b'air':
-    global anim = anim_air
+    anim = anim_air
     # fill(193,226,255)
     print("Neue Szene: Air")
     client.publish(topic_pub, "Neue Szene: Air")
   elif msg == b'water':
-    global anim = anim_water
+    anim = anim_water
     # fill(39,100,193)
     print("Neue Szene: Water")
     client.publish(topic_pub, "Neue Szene: Water")
