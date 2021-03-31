@@ -10,6 +10,10 @@ from umqttsimple import MQTTClient
 # from machine import soft_reset
 import config
 
+#from bitmaps import earth
+# !!!!!!! erzeugt Memory Error
+earth = [[ 0, 0, 0], [ 0, 0, 0], [142, 77, 21], [137, 88, 21], [129, 88, 0], [227, 173, 49], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [156, 77, 18], [173, 120, 28], [175, 128, 14], [174, 126, 2], [180, 110, 12], [155, 80, 0], [ 0, 0, 0], [207, 146, 39], [159, 103, 10], [172, 118, 9], [172, 118, 9], [172, 118, 9], [142, 84, 20], [149, 76, 7], [154, 77, 5], [166, 138, 5], [177, 145, 22], [137, 90, 10], [139, 84, 19], [137, 75, 14], [142, 84, 20], [142, 81, 14], [144, 81, 14], [157, 117, 4], [151, 108, 6], [137, 90, 10], [144, 80, 16], [153, 96, 29], [142, 84, 20], [135, 88, 8], [136, 85, 22], [157, 77, 0], [187, 110, 28], [137, 90, 10], [159, 97, 0], [159, 97, 0], [159, 97, 0], [130, 94, 0], [135, 88, 6], [ 0, 0, 0], [209, 102, 20], [182, 83, 0], [154, 80, 0], [227, 171, 60], [210, 172, 39], [136, 90, 4], [ 0, 0, 0], [ 0, 0, 0], [ 0, 0, 0], [175, 81, 0], [148, 82, 0], [161, 107, 19], [156, 112, 17], [ 0, 0, 0], [ 0, 0, 0]]
+
 mqtt_server = config.BrokerIP
 client_id = ubinascii.hexlify(machine.unique_id())
 topic_sub = b'4elements/command'
@@ -27,16 +31,26 @@ counter = 0
 do_reset = False
 
 # Animation
-step = 5
-delay = 10
+step = 0
+delay = 100 # ms
 winkel = 0
 max_brightness = 0.5
 
 buff_target=[[0, 0, 0] for x in range(0,64)]
 buff_current=[[0, 0, 0] for x in range(0,64)]
 
+
 def anim_earth():
-  fill(142,98,44)
+  # fill(142,98,44)
+  global step
+  for i in range(0,64):
+    np[i]=(int(earth[i][0]*max_brightness),int(earth[i][1]*max_brightness),int(earth[i][2]*max_brightness))
+  np.write()
+  if step < 17:
+    step += 1
+  else:
+    step = 0
+
 
 def anim_fire():
   fill(211,54,2)
@@ -51,9 +65,13 @@ anim = anim_fire
 
 def sub_cb(topic, msg):
   global anim
+  global delay
+  global step
   print((topic, msg))
   if msg == b'earth':
     anim = anim_earth
+    delay = 300
+    step = 0
     # fill(142,98,44)
     print("Neue Szene: Earth")
     client.publish(topic_pub, "Neue Szene: Earth")
@@ -112,4 +130,4 @@ while True:
     except OSError as e:
       #restart_and_reconnect()
       print("Fehler beim Abrufen der Nachricht")
-    time.sleep_ms(100)
+    time.sleep_ms(delay)
