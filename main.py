@@ -16,7 +16,7 @@ earth = [[ 0, 0, 0], [ 0, 0, 0], [142, 77, 21], [137, 88, 21], [129, 88, 0], [22
 
 mqtt_server = config.BrokerIP
 client_id = ubinascii.hexlify(machine.unique_id())
-topic_sub = b'4elements/command'
+topic_sub = b'4elements/#'
 topic_pub = b'4elements/status'
 
 # NEOPIXEL
@@ -64,38 +64,51 @@ def anim_water():
 anim = anim_fire
 
 def sub_cb(topic, msg):
-  global anim
-  global delay
-  global step
+  global anim, delay, step, max_brightness
   print((topic, msg))
-  if msg == b'earth':
-    anim = anim_earth
-    delay = 300
-    step = 0
-    # fill(142,98,44)
-    print("Neue Szene: Earth")
-    client.publish(topic_pub, "Neue Szene: Earth")
-  elif msg == b'fire':
-    anim = anim_fire
-    # fill(211,54,2)
-    print("Neue Szene: Fire")
-    client.publish(topic_pub, "Neue Szene: Fire")
-  elif msg == b'air':
-    anim = anim_air
-    # fill(193,226,255)
-    print("Neue Szene: Air")
-    client.publish(topic_pub, "Neue Szene: Air")
-  elif msg == b'water':
-    anim = anim_water
-    # fill(39,100,193)
-    print("Neue Szene: Water")
-    client.publish(topic_pub, "Neue Szene: Water")
-  elif msg == b'reset':
-    print("Softreset")
-    # global do_reset = True # Softreset in der Callback Funktion schlägt irgendwie fehl...
-    machine.soft_reset()
-  elif topic == b'4elements/command' and msg == b'received':
-    print('ESP received hello message')
+  if topic == b'4elements/setScene': # sieht in etwa so aus (b'4elements/setScene', b'fire')
+    if msg == b'earth':
+      anim = anim_earth
+      delay = 300
+      step = 0
+      # fill(142,98,44)
+      print("Neue Szene: Earth")
+      client.publish(topic_pub, "Neue Szene: Earth")
+    elif msg == b'fire':
+      anim = anim_fire
+      # fill(211,54,2)
+      print("Neue Szene: Fire")
+      client.publish(topic_pub, "Neue Szene: Fire")
+    elif msg == b'air':
+      anim = anim_air
+      # fill(193,226,255)
+      print("Neue Szene: Air")
+      client.publish(topic_pub, "Neue Szene: Air")
+    elif msg == b'water':
+      anim = anim_water
+      # fill(39,100,193)
+      print("Neue Szene: Water")
+      client.publish(topic_pub, "Neue Szene: Water")
+    else:
+      client.publish(topic_pub, "Unbekannte Szene")
+
+  elif topic == b'4elements/setBrightness':
+    a = int(msg)
+    print(str(a))
+    print(str(a/100))
+    if a < 0 or a > 100:
+      a = 50
+    max_brightness = a / 100
+
+  elif topic == b'4elements/doReset':
+    client.publish(topic_pub, "Ich starte mich neu...")
+    time.sleep_ms(100)
+    machine.reset()
+    # machine.soft_reset()
+
+  else:
+    pass
+
 
 def connect_and_subscribe():
   global client_id, mqtt_server, topic_sub
@@ -108,7 +121,7 @@ def connect_and_subscribe():
 
 def fill(r,g,b):
   for i in range(0,64):
-    np[i]=(r,g,b)
+    np[i]=(int(r*max_brightness),int(g*max_brightness),int(b*max_brightness))
   np.write()
 
 try:
